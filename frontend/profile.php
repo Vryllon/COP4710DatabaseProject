@@ -9,6 +9,13 @@
         <h1>
             <p id="profile"></p>
         </h1>
+
+        <div>
+            <a href="contracts.php">contracts</a>
+            <a href="search.php">search</a>
+            <a href="profile.php">my profile</a>
+        </div>
+
         <div>
             <p id="balance"></p>
             <p id="address"></p>

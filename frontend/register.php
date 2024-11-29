@@ -32,7 +32,6 @@
             </div>
             <br>
 
-            <!-- Dynamic Parent Inputs Container -->
             <div id="parentsContainer">
                 <p>Parent 1:</p>
                 <div id="parent1name">
@@ -55,7 +54,6 @@
 
             <br>
 
-            <!-- Buttons for adding/removing parent fields -->
             <button type="button" onclick="addParentField()">Add Another Parent</button>
             <button type="button" onclick="removeLastParentField()">Remove Last Parent</button>
             <br><br>
