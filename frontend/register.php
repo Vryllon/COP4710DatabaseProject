@@ -31,6 +31,16 @@
                 <input type="text" id="phone" name="phone" required>
             </div>
             <br>
+            <div>
+                <label for="email">Email:</label>
+                <input type="text" id="email" name="email" required>
+            </div>
+            <br>
+            <div>
+                <label for="maxHours">Max Hours per week:</label>
+                <input type="text" id="maxHours" name="maxHours" required>
+            </div>
+            <br>
 
             <div id="parentsContainer">
                 <p>Parent 1:</p>

@@ -11,54 +11,60 @@ function handleRegisterSubmit(event) {
     const password = document.getElementById("password").value;
     const address = document.getElementById("address").value;
     const phone = document.getElementById("phone").value;
+    const email = document.getElementById("email").value;
+    const maxHours = document.getElementById("maxHours").value;
 
     // Initialize an array to collect parent values
     const parents = [];
 
-    // Iterate through the FormData entries to collect data for "parent" fields
+    // Collect parent data from dynamic fields
     for (let [key, value] of formData.entries()) {
         if (key.startsWith('parent')) {
-            parents.push(value); // Collect parent data
+            parents.push(value);
         }
     }
 
-    // REMOVE AFTER NEXT SECTION IS UNCOMMENTED
+    // Log the collected form data (for debugging purposes)
     console.log("Username:", username);
     console.log("Password:", password);
     console.log("Address:", address);
     console.log("Phone #:", phone);
+    console.log("Email:", email);
+    console.log("Max Hours:", maxHours);
     console.log("Parents:", parents);
-    localStorage.setItem('username', username);
-    localStorage.setItem('profile', username);
 
-    // Redirect to the profile page
-    window.location.href = "profile.php";
-
-    // UNCOMMENT AND CHANGE WHEN BACKEND IS READY
-    // const registerData = { username, password, address, phone, parents };
+    // Prepare the data object to send to the API
+    const registerData = {
+        name: username, 
+        email: email, 
+        phone: phone,
+        address: address,
+        password: password,
+        max_hours: maxHours, 
+        parents: parents 
+    };
 
     // Use Fetch API to send register data to the server
-    // fetch('http://localhost:3000/register', {
-    //     method: 'POST',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify(registerData)  // Send register data as JSON
-    // })
-    // .then(response => response.json())  // Assuming the server responds with JSON
-    // .then(data => {
-    //     if (data.success) {
-    //         // Save user_id in localStorage
-    //         localStorage.setItem('user_id', data.user_id);  
-
-    //         // Redirect to another page (e.g., dashboard)
-    //         window.location.href = "profile.php";
-    //     } else {
-    //         // Show an error message if login fails
-    //         alert(data.message || "Cannot create an account with that information!");
-    //     }
-    // })
-    // .catch(error => {
-    //     console.error('Error:', error);
-    // });
+    fetch('../backend/register.php', { // This is the PHP script handling the registration
+        method: 'POST',
+        body: new URLSearchParams(registerData)
+    })
+    .then(response => response.text())
+    .then(data => {
+        if (data === "Registration successful!") {
+            // Show success message and redirect to profile page
+            alert("Registration successful!");
+            window.location.href = "profile.php";
+        } else if (data === "Email already exists!") {
+            // Show an error if the email already exists
+            alert("Email already exists!");
+        } else {
+            // Show generic error message
+            alert("Error: " + data);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert("There was an error with the registration. Please try again.");
+    });
 }
