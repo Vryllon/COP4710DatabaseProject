@@ -11,8 +11,8 @@
 
         <form id="loginForm" onsubmit="handleLoginSubmit(event)">
             <div>
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
+                <label for="email">Email:</label>
+                <input type="text" id="email" name="email" required>
             </div>
             <br>
             <div>
