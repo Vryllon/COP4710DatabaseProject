@@ -4,42 +4,33 @@ function handleLoginSubmit(event) {
     event.preventDefault();
 
     // Get the form data
-    const username = document.getElementById("username").value;
+    const email = document.getElementById("email").value; 
     const password = document.getElementById("password").value;
 
-    // REMOVE AFTER NEXT SECTION IS UNCOMMENTED
-    console.log("Username:", username);
-    console.log("Password:", password);
-    localStorage.setItem('username', username);
-    localStorage.setItem('profile', username);
-    window.location.href = "profile.php";
-    
-    // UNCOMMENT AND CHANGE WHEN BACKEND IS READY
-    //const loginData = { username, password };
+    // Prepare the data to send in the POST request
+    const loginData = new URLSearchParams();
+    loginData.append("email", email);
+    loginData.append("password", password);
 
-    // Use Fetch API to send login data to the server
-    // fetch('http://localhost:3000/login', {
-    //     method: 'POST',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify(loginData)  // Send login data as JSON
-    // })
-    // .then(response => response.json())  // Assuming the server responds with JSON
-    // .then(data => {
-    //     if (data.success) {
-    //         // Save user_id in localStorage
-    //         localStorage.setItem('user_id', data.user_id);  
-
-    //         // Redirect to another page (e.g., dashboard)
-    //         window.location.href = "profile.php";
-    //     } else {
-    //         // Show an error message if login fails
-    //         alert(data.message || "Invalid username or password!");
-    //     }
-    // })
-    // .catch(error => {
-    //     console.error('Error:', error);
-    // });
+    // Send login data to the PHP server using Fetch API
+    fetch('../backend/login.php', { // This is the PHP script that handles login
+        method: 'POST',
+        body: loginData, 
+    })
+    .then(response => response.text())
+    .then(data => {
+        // Check if login was successful
+        if (data === "Login successful!") {
+            
+            // Redirect to the profile page
+            window.location.href = "profile.php";
+        } else {
+            // If login fails, show an error message
+            alert("Invalid email or password!");
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert("There was an error with the login. Please try again.");
+    });
 }
-

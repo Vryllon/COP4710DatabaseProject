@@ -1,7 +1,7 @@
 // Retrieve data from localStorage
 const profile = localStorage.getItem('profile');
 
-// Retrive data from backend
+// Retrive data from backend (currently just default values)
 const balance = 0;
 const address = '';
 const phone = '';
