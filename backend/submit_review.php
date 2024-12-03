@@ -2,30 +2,42 @@
 require 'config.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $contractID = $_POST['contract_id'];
-    $rating = $_POST['rating']; // 1 to 5
-    $review = $_POST['review']; // Optional feedback
+    // Get the data sent from JavaScript
+    $data = json_decode(file_get_contents('php://input'), true);
+    $contractID = $data['contractID'];
+    $memberID = $data['memberID'];
+    $caregiverID = $data['caregiverID'];
+    $rating = $data['rating']; // 1 to 5
+    $review = $data['comment']; // Optional feedback
+
+    // Initialize response array
+    $response = ['success' => false, 'message' => ''];
 
     try {
         // Insert the review into the database
-        $stmt = $pdo->prepare("INSERT INTO Reviews (ContractID, Rating, Review) VALUES (?, ?, ?)");
-        $stmt->execute([$contractID, $rating, $review]);
+        $stmt = $pdo->prepare("INSERT INTO Reviews (ContractID, ReviewerID, CaregiverID, Rating, Comment) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([$contractID, $memberID, $caregiverID, $rating, $review]);
 
         // Update caregiver's average rating
         $stmt = $pdo->prepare("
             UPDATE Members 
-            SET AvgRating = (
+            SET Rating = (
                 SELECT AVG(Rating)
                 FROM Reviews 
-                WHERE CaregiverID = (SELECT CaregiverID FROM Contracts WHERE ContractID = ?)
+                WHERE CaregiverID = ?
             )
-            WHERE MemberID = (SELECT CaregiverID FROM Contracts WHERE ContractID = ?)
+            WHERE MemberID = ?
         ");
-        $stmt->execute([$contractID, $contractID]);
+        $stmt->execute([$caregiverID, $caregiverID]);
 
-        echo "Review submitted successfully.";
+        $response['success'] = true;
+        $response['message'] = "Review submitted successfully.";
     } catch (PDOException $e) {
-        echo "Error submitting review: " . $e->getMessage();
+        // Catch any database errors and add to the response
+        $response['message'] = "Error submitting review: " . $e->getMessage();
     }
+
+    // Return the response as JSON
+    echo json_encode($response);
 }
 ?>

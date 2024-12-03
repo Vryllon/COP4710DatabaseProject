@@ -18,10 +18,22 @@ function handleRegisterSubmit(event) {
     const parents = [];
 
     // Collect parent data from dynamic fields
-    for (let [key, value] of formData.entries()) {
-        if (key.startsWith('parent')) {
-            parents.push(value);
-        }
+    let parentCounter = 1; // Start counting parents
+    while (formData.has(`parent${parentCounter}name`)) {
+        const parentName = formData.get(`parent${parentCounter}name`);
+        const parentAge = formData.get(`parent${parentCounter}age`);
+        const parentHealth = formData.get(`parent${parentCounter}health`);
+        const parentAddress = formData.get(`parent${parentCounter}address`);
+
+        // Store parent data as an object
+        parents.push({
+            name: parentName,
+            age: parentAge,
+            health: parentHealth,
+            address: parentAddress
+        });
+
+        parentCounter++;
     }
 
     // Log the collected form data (for debugging purposes)
@@ -41,7 +53,7 @@ function handleRegisterSubmit(event) {
         address: address,
         password: password,
         max_hours: maxHours, 
-        parents: parents 
+        parents: JSON.stringify(parents) // Send parents as a JSON string
     };
 
     // Use Fetch API to send register data to the server
@@ -52,9 +64,9 @@ function handleRegisterSubmit(event) {
     .then(response => response.text())
     .then(data => {
         if (data === "Registration successful!") {
-            // Show success message and redirect to profile page
+            // Show success message and redirect to login page
             alert("Registration successful!");
-            window.location.href = "profile.php";
+            window.location.href = "login.php";
         } else if (data === "Email already exists!") {
             // Show an error if the email already exists
             alert("Email already exists!");

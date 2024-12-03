@@ -1,12 +1,13 @@
 <?php
+session_start();
 require 'config.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $userID = $_GET['user_id'];
+    $userID = $_SESSION['MemberID'];
 
     try {
         $stmt = $pdo->prepare("
-            SELECT Name, Email, Phone, Location, CareMoney, AvgRating
+            SELECT Name, Email, Phone, Address, CareMoneyBalance, Rating, MaxAvailableHoursPerWeek
             FROM Members
             WHERE MemberID = ?
         ");

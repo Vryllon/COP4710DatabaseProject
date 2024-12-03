@@ -2,21 +2,32 @@
 require 'config.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $address = $_GET['address'];
+    $address = isset($_GET['address']) ? $_GET['address'] : '';
+
+    // Ensure that address is provided
+    if (empty($address)) {
+        echo json_encode(['error' => 'No address provided']);
+        exit;
+    }
 
     try {
+        // Prepare and execute the query
         $stmt = $pdo->prepare("
-            SELECT MemberID, Name, Location, AvgRating, MaxAvailableHours - UsedHours AS AvailableHours
+            SELECT MemberID, Name, Address, Rating, MaxAvailableHoursPerWeek AS AvailableHours
             FROM Members
-            WHERE Location LIKE ?
+            WHERE Address LIKE :address
         ");
-        $stmt->execute(["%$address%"]);
+        $stmt->execute(['address' => "%$address%"]);
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        echo json_encode($results);
+        if ($results) {
+            echo json_encode($results); // Return results as JSON
+        } else {
+            echo json_encode(['message' => 'No results found']);
+        }
     } catch (PDOException $e) {
-        http_response_code(500);
-        echo json_encode(['error' => $e->getMessage()]);
+        // Return detailed error message for debugging
+        echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
     }
 }
 ?>

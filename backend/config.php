@@ -2,7 +2,7 @@
 $host = 'localhost';
 $db = 'caregiver_website';
 $user = 'root';
-$password = '';
+$password = '#VryllonApril2004';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $password);
