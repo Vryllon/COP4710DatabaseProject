@@ -18,14 +18,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Fetch Caregiver's MemberID using the caregiver's email
         $stmt = $pdo->prepare("SELECT MemberID, MaxAvailableHoursPerWeek FROM Members WHERE Email = ?");
         $stmt->execute([$member_email]);
-        $caregiver = $stmt->fetch(PDO::FETCH_ASSOC);
+        $member = $stmt->fetch(PDO::FETCH_ASSOC);
         
-        if (!$caregiver) {
+        if (!$member) {
             echo "Error: Caregiver not found with the given email.";
             exit;
         }
-        $caregiver_id = $caregiver['MemberID'];
-        $maxHoursAvailable = $caregiver['MaxAvailableHoursPerWeek'];
+        $member_id = $member['MemberID'];
+        $maxHoursAvailable = $member['MaxAvailableHoursPerWeek'];
 
         // Check if caregiver has enough available hours
         if ($total_hours > $maxHoursAvailable) {
@@ -66,13 +66,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             exit;
         }
 
+        // Add the contract cost to the caregiver's CareMoneyBalance
+        $stmt = $pdo->prepare("UPDATE Members SET CareMoneyBalance = CareMoneyBalance + ? WHERE MemberID = ?");
+        $stmt->execute([$contractCost, $_SESSION['MemberID']]);
+
+        // Deduct the contract cost from the member's CareMoneyBalance
+        $stmt = $pdo->prepare("UPDATE Members SET CareMoneyBalance = CareMoneyBalance - ? WHERE MemberID = ?");
+        $stmt->execute([$contractCost, $member_id]);
+
         // Insert the contract into the Contracts table
         $sql = "INSERT INTO Contracts (MemberID, CaregiverID, ParentID, StartDate, EndDate, TotalHours, HourlyRate)
                 VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$_SESSION['MemberID'], $caregiver_id, $parent_id, $start_date, $end_date, $total_hours, $hourly_rate]);
+        $stmt->execute([$member_id, $_SESSION['MemberID'], $parent_id, $start_date, $end_date, $total_hours, $hourly_rate]);
 
         echo "Contract created successfully!";
+
     } catch (PDOException $e) {
         echo "Error: " . $e->getMessage();
     }
