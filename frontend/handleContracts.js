@@ -126,9 +126,9 @@ function addReview(contractID, memberID, caregiverID) {
     }
 }
 
-
-
 function toggleCreateForm() {
     const form = document.getElementById('create-contract-form');
     form.style.display = form.style.display === 'none' ? 'block' : 'none';
 }
+
+fetchContracts();
